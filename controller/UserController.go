@@ -19,7 +19,6 @@ func Register(c *gin.Context) {
 
 	var user models.UserModel
 	user.Status = 1
-	validate := validator.New()
 	data, err := c.GetRawData()
 	if err != nil {
 		fmt.Println(err.Error())
@@ -32,12 +31,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	err = validate.Struct(user)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"code": 4001, "msg": err.Error()})
-		return
-	}
-	jsonData := make(map[string]interface{})
+	jsonData := make(map[string]interface{}) //添加用户密码
 	err = json.Unmarshal(data, &jsonData)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"code": 5001, "msg": err.Error()})
@@ -48,10 +42,15 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"code": 4001, "msg": "提交参数错误"})
 		return
 	}
-
 	models.SetUserPasswd(&user, jsonData["password"].(string))
 
-	_, err = models.GetUserByUserName(user.Username)
+	validate := models.ValidateUser(&user) //校验合法性
+	if validate != "" {
+		c.JSON(http.StatusOK, gin.H{"code": 4001, "msg": validate})
+		return
+	}
+
+	_, err = models.GetUserByUserName(user.Username) //判断用户名唯一
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "用户名已经存在"})
 		return
@@ -163,15 +162,14 @@ func UpdateUser(c *gin.Context) {
 		user.Name = name.(string)
 	}
 
-	username, exist := jsonData["username"]
+	email, exist := jsonData["email"]
 	if exist {
-		user.Username = username.(string)
+		user.Email = email.(string)
 	}
 
-	validate := validator.New()
-	err = validate.Struct(user)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"code": 4001, "msg": err.Error()})
+	validate := models.ValidateUser(user)
+	if validate != "" {
+		c.JSON(http.StatusOK, gin.H{"code": 4001, "msg": validate})
 		return
 	}
 	err = models.UpdateUser(user)
