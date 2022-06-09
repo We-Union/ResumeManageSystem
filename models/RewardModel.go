@@ -10,6 +10,8 @@ type RewardModel struct {
 	Name      string `json:"name,omitempty"  validate:"required"`
 	Rank      string `json:"rank"`
 	Host      string `json:"host"`
+	Date      string `json:"date"`
+	File      string `json:"file"`
 	OwnerID   int
 	Owner     UserModel `json:"owner,omitempty" gorm:"Foreignkey:OwnerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"  validate:"-"`
 	CreatedAt time.Time `json:"created_at,omitempty" gorm:"autoCreateTime,omitempty"`
@@ -20,9 +22,9 @@ func CreateReward(reward *RewardModel) (err error) {
 	return err
 }
 
-func GetRewardByID(groupID int) (reward *RewardModel, err error) {
+func GetRewardByID(id int) (reward *RewardModel, err error) {
 	reward = new(RewardModel)
-	err = dao.DB.Where("id = ?", groupID).First(&reward).Error
+	err = dao.DB.Where("id = ?", id).First(&reward).Error
 	if err != nil {
 		return nil, err
 	}
@@ -52,12 +54,22 @@ func GetRewardNumByOwnerID(ownerID int) (num int64, err error) {
 	}
 	return num, nil
 }
-func DeleteRewardByID(groupID int) (err error) {
-	err = dao.DB.Where("id=?", groupID).Delete(&RewardModel{}).Error
+func DeleteRewardByID(id int) (err error) {
+	err = dao.DB.Where("id=?", id).Delete(&RewardModel{}).Error
 	return
 }
 
 func UpdateReward(reward *RewardModel) (err error) {
 	err = dao.DB.Save(reward).Error
 	return err
+}
+
+func ValidateReward(reward *RewardModel) (message string) {
+	if reward.Date == "" {
+		return "获奖日期不能为空"
+	}
+	if reward.Name == "" {
+		return "名称不能为空"
+	}
+	return ""
 }

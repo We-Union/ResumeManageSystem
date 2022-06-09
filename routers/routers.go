@@ -33,6 +33,16 @@ func SetupRouter() *gin.Engine {
 		//userRoutes.POST("/new-validation", controller.NewValidation)
 
 	}
+	resumeRoutes := r.Group("/api")
+	{
 
+		resumeRoutes.POST("/reward", controller.CreateReward)
+		resumeRoutes.POST("/upload-reward", controller.UploadReward)
+		resumeRoutes.DELETE("/reward", controller.DeleteReward)
+		resumeRoutes.GET("/reward", controller.GetReward)
+		resumeRoutes.GET("/my-reward", controller.GetMyReward)
+		resumeRoutes.PUT("/reward", controller.UpdateReward)
+		resumeRoutes.GET("/download-reward", controller.DownloadReward)
+	}
 	return r
 }

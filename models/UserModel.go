@@ -5,7 +5,10 @@ import (
 	"ResumeMamageSystem/utils"
 	"crypto/sha256"
 	"encoding/hex"
+	"os"
+	"path/filepath"
 	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -30,6 +33,8 @@ func CreateUser(user *UserModel) (err error) {
 	if err != nil {
 		return err
 	}
+	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	err = os.MkdirAll(filepath.Join(dir, "resumes", strconv.Itoa(user.ID)), os.ModePerm)
 	return err
 }
 func GetUserByUserName(username string) (user *UserModel, err error) {

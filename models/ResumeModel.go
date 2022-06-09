@@ -8,8 +8,8 @@ import (
 type ResumeModel struct {
 	ID        int    `json:"id,omitempty" gorm:"primary_key"`
 	Name      string `json:"name,omitempty"  validate:"required"`
-	Rank      string `json:"rank"`
-	Host      string `json:"host"`
+	Target    string `json:"target"`
+	File      string `json:"file"`
 	OwnerID   int
 	Owner     UserModel `json:"owner,omitempty" gorm:"Foreignkey:OwnerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"  validate:"-"`
 	CreatedAt time.Time `json:"created_at,omitempty" gorm:"autoCreateTime,omitempty"`
