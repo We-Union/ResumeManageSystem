@@ -77,6 +77,14 @@ func UploadReward(c *gin.Context) {
 	}
 	file, err := c.FormFile("file")
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+
+	if !utils.IsExist(filepath.ToSlash(filepath.Join(dir, "rewards", strconv.Itoa(uidInt)))) {
+		err = os.MkdirAll(filepath.ToSlash(filepath.Join(dir, "rewards", strconv.Itoa(uidInt))), os.ModePerm)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{"code": 5001, "msg": "创建上传文件夹失败"})
+			return
+		}
+	}
 	reward.File = path.Join("rewards", strconv.Itoa(uidInt), strconv.Itoa(reward.ID)+path.Ext(file.Filename))
 	full_path := filepath.ToSlash(filepath.Join(dir, reward.File))
 	err = c.SaveUploadedFile(file, full_path)
@@ -110,7 +118,10 @@ func GetReward(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您没有权限查看"})
 		return
 	}
-
+	if reward.File == "" {
+		c.JSON(http.StatusOK, gin.H{"code": 4004, "msg": "该奖项没有上传文件"})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"code": 0, "data": reward})
 	return
 }
@@ -264,6 +275,10 @@ func DownloadReward(c *gin.Context) {
 	}
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	fullPath := path.Join(dir, reward.File)
+	if !utils.IsExist(fullPath) {
+		c.JSON(http.StatusOK, gin.H{"code": 4004, "msg": "文件不存在，这可能是系统错误，请联系管理员"})
+		return
+	}
 	_, fileName := filepath.Split(fullPath)
 	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment;filename=%s", fileName))
 	c.File(fullPath)

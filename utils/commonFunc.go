@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -30,4 +31,8 @@ func GetUidInt(c *gin.Context) (uidInt int) {
 	}
 	uidInt_ := uid.(int)
 	return uidInt_
+}
+func IsExist(path string) (exist bool) {
+	_, err := os.Stat(path)
+	return err == nil
 }

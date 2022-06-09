@@ -85,10 +85,14 @@ func UploadResume(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"code": 5001, "msg": err.Error()})
 		return
 	}
-	fmt.Println(strconv.Itoa(uidInt))
-	fmt.Println(strconv.Itoa(resume.ID))
-	fmt.Println(path.Ext(file.Filename))
 
+	if !utils.IsExist(filepath.ToSlash(filepath.Join(dir, "resumes", strconv.Itoa(uidInt)))) {
+		err = os.MkdirAll(filepath.ToSlash(filepath.Join(dir, "resumes", strconv.Itoa(uidInt))), os.ModePerm)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{"code": 5001, "msg": "创建上传文件夹失败"})
+			return
+		}
+	}
 	resume.File = path.Join("resumes", strconv.Itoa(uidInt), strconv.Itoa(resume.ID)+path.Ext(file.Filename))
 	fullPath := filepath.ToSlash(filepath.Join(dir, resume.File))
 	err = c.SaveUploadedFile(file, fullPath)
@@ -269,8 +273,16 @@ func DownloadResume(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您没有权限查看"})
 		return
 	}
+	if resume.File == "" {
+		c.JSON(http.StatusOK, gin.H{"code": 4004, "msg": "该简历没有上传文件"})
+		return
+	}
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	fullPath := path.Join(dir, resume.File)
+	if !utils.IsExist(fullPath) {
+		c.JSON(http.StatusOK, gin.H{"code": 4004, "msg": "文件不存在，这可能是系统错误，请联系管理员"})
+		return
+	}
 	_, fileName := filepath.Split(fullPath)
 	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment;filename=%s", fileName))
 	c.File(fullPath)
