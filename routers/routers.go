@@ -33,16 +33,27 @@ func SetupRouter() *gin.Engine {
 		//userRoutes.POST("/new-validation", controller.NewValidation)
 
 	}
+	rewardRoutes := r.Group("/api")
+	{
+
+		rewardRoutes.POST("/reward", controller.CreateReward)
+		rewardRoutes.POST("/upload-reward", controller.UploadReward)
+		rewardRoutes.DELETE("/reward", controller.DeleteReward)
+		rewardRoutes.GET("/reward", controller.GetReward)
+		rewardRoutes.GET("/my-reward", controller.GetMyReward)
+		rewardRoutes.PUT("/reward", controller.UpdateReward)
+		rewardRoutes.GET("/download-reward", controller.DownloadReward)
+	}
 	resumeRoutes := r.Group("/api")
 	{
 
-		resumeRoutes.POST("/reward", controller.CreateReward)
-		resumeRoutes.POST("/upload-reward", controller.UploadReward)
-		resumeRoutes.DELETE("/reward", controller.DeleteReward)
-		resumeRoutes.GET("/reward", controller.GetReward)
-		resumeRoutes.GET("/my-reward", controller.GetMyReward)
-		resumeRoutes.PUT("/reward", controller.UpdateReward)
-		resumeRoutes.GET("/download-reward", controller.DownloadReward)
+		resumeRoutes.POST("/resume", controller.CreateResume)
+		resumeRoutes.POST("/upload-resume", controller.UploadResume)
+		resumeRoutes.DELETE("/resume", controller.DeleteResume)
+		resumeRoutes.GET("/resume", controller.GetResume)
+		resumeRoutes.GET("/my-resume", controller.GetMyResume)
+		resumeRoutes.PUT("/resume", controller.UpdateResume)
+		resumeRoutes.GET("/download-resume", controller.DownloadResume)
 	}
 	return r
 }

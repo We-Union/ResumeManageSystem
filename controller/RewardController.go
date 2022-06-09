@@ -2,9 +2,9 @@ package controller
 
 import (
 	"ResumeMamageSystem/models"
+	"ResumeMamageSystem/utils"
 	"errors"
 	"fmt"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -16,14 +16,10 @@ import (
 
 func CreateReward(c *gin.Context) {
 
-	session := sessions.Default(c)
-	uid := session.Get("uid")
-
-	if uid == nil {
-		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您还未登录，请先登录"})
+	uidInt := utils.GetUidInt(c)
+	if uidInt == -1 {
 		return
 	}
-	uidInt := uid.(int)
 
 	var reward models.RewardModel
 
@@ -53,14 +49,11 @@ func CreateReward(c *gin.Context) {
 	}
 }
 func UploadReward(c *gin.Context) {
-	session := sessions.Default(c)
-	uid := session.Get("uid")
-
-	if uid == nil {
-		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您还未登录，请先登录"})
+	uidInt := utils.GetUidInt(c)
+	if uidInt == -1 {
 		return
 	}
-	uidInt := uid.(int)
+
 	rewardId := c.Query("id")
 	if rewardId == "" {
 		c.JSON(http.StatusOK, gin.H{"code": 4001, "msg": "请求参数错误"})
@@ -91,14 +84,11 @@ func UploadReward(c *gin.Context) {
 	return
 }
 func GetReward(c *gin.Context) {
-	session := sessions.Default(c)
-	uid := session.Get("uid")
-
-	if uid == nil {
-		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您还未登录，请先登录"})
+	uidInt := utils.GetUidInt(c)
+	if uidInt == -1 {
 		return
 	}
-	uidInt := uid.(int)
+
 	rewardId := c.Query("id")
 	if rewardId == "" {
 		c.JSON(http.StatusOK, gin.H{"code": 4001, "msg": "请求参数错误"})
@@ -126,11 +116,8 @@ func GetReward(c *gin.Context) {
 }
 
 func DeleteReward(c *gin.Context) {
-	session := sessions.Default(c)
-	uid := session.Get("uid")
-
-	if uid == nil {
-		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您还未登录，请先登录"})
+	uidInt := utils.GetUidInt(c)
+	if uidInt == -1 {
 		return
 	}
 	id := c.Query("id")
@@ -150,7 +137,7 @@ func DeleteReward(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"code": 5001, "msg": err.Error()})
 		return
 	}
-	if reward.OwnerID != uid.(int) {
+	if reward.OwnerID != uidInt {
 		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您没有权限执行该操作"})
 		return
 	}
@@ -164,11 +151,8 @@ func DeleteReward(c *gin.Context) {
 }
 
 func GetMyReward(c *gin.Context) {
-	session := sessions.Default(c)
-	uid := session.Get("uid")
-
-	if uid == nil {
-		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您还未登录，请先登录"})
+	uidInt := utils.GetUidInt(c)
+	if uidInt == -1 {
 		return
 	}
 
@@ -178,7 +162,7 @@ func GetMyReward(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"code": 4001, "msg": "请求参数错误"})
 		return
 	}
-	ownerIDint := uid.(int)
+	ownerIDint := uidInt
 	startInt, _ := strconv.Atoi(start)
 	endInt, _ := strconv.Atoi(end)
 	fmt.Println(startInt, endInt)
@@ -193,11 +177,8 @@ func GetMyReward(c *gin.Context) {
 }
 
 func UpdateReward(c *gin.Context) {
-	session := sessions.Default(c)
-	uid := session.Get("uid")
-
-	if uid == nil {
-		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您还未登录，请先登录"})
+	uidInt := utils.GetUidInt(c)
+	if uidInt == -1 {
 		return
 	}
 
@@ -218,7 +199,7 @@ func UpdateReward(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"code": 5001, "msg": err.Error()})
 		return
 	}
-	if reward.OwnerID != uid.(int) {
+	if reward.OwnerID != uidInt {
 		c.JSON(http.StatusOK, gin.H{"ode": 4003, "msg": "您没有权限执行该操作"})
 		return
 	}
@@ -256,14 +237,10 @@ func UpdateReward(c *gin.Context) {
 }
 
 func DownloadReward(c *gin.Context) {
-	session := sessions.Default(c)
-	uid := session.Get("uid")
-
-	if uid == nil {
-		c.JSON(http.StatusOK, gin.H{"code": 4003, "msg": "您还未登录，请先登录"})
+	uidInt := utils.GetUidInt(c)
+	if uidInt == -1 {
 		return
 	}
-	uidInt := uid.(int)
 	rewardId := c.Query("id")
 	if rewardId == "" {
 		c.JSON(http.StatusOK, gin.H{"code": 4001, "msg": "请求参数错误"})

@@ -61,3 +61,13 @@ func UpdateResume(resume *ResumeModel) (err error) {
 	err = dao.DB.Save(resume).Error
 	return err
 }
+
+func ValidateResume(resume *ResumeModel) (message string) {
+	if resume.Name == "" {
+		return "简历名称不能为空"
+	}
+	if resume.Target == "" {
+		return "投递意向不能为空"
+	}
+	return ""
+}
