@@ -94,6 +94,11 @@ func UploadResume(c *gin.Context) {
 		}
 	}
 	resume.File = path.Join("resumes", strconv.Itoa(uidInt), strconv.Itoa(resume.ID)+path.Ext(file.Filename))
+	err = models.UpdateResume(resume)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"code": 5001, "msg": err.Error()})
+		return
+	}
 	fullPath := filepath.ToSlash(filepath.Join(dir, resume.File))
 	err = c.SaveUploadedFile(file, fullPath)
 	c.JSON(http.StatusOK, gin.H{"code": 0})
